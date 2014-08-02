@@ -198,6 +198,8 @@ Person.prototype.lift = function(weight) {
       that.strength+=100 //modify strength of object
       console.log('Strength: ' + that.strength);
       resolve(that.strength);//passes that.strength to the next item
+    });
+  });
 }
 
 Person.prototype.google = function(query) {
