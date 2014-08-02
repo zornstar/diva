@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # diva
 
 Expressive waterfall chaining using promises
