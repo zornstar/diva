@@ -1,6 +1,6 @@
 {
   "name": "diva",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Expressive waterfalls with chained promises",
   "main": "index.js",
   "repository": {
@@ -9,7 +9,7 @@
   },
   "keywords": ["waterfall","expressive","chain","promises","diva"],
   "author": "Matthew Zorn <zornstar@gmail.com>",
-  "license": "BSD-3-Clause",
+  "license": "Apache 2.0",
   "bugs": {
     "url": "https://github.com/zornstar/diva/issues"
   },
