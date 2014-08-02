@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # diva
 
 Expressive waterfall chaining using promises
@@ -276,3 +277,9 @@ john
 
 
 ```
+=======
+diva
+====
+
+A small framework to enable a waterfall of chained expressive methods returning promises
+>>>>>>> 8b611f63870fe7f5926fc33309892a431a951489
