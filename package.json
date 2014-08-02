@@ -15,8 +15,5 @@
   },
   "dependencies": {
     "rsvp": "~3.0.9"
-  },
-  "devDependencies": {
-    "mocha": "~1.17.0"
   }
 }
