@@ -46,7 +46,7 @@ that.generate(function <name>(result) {
 
 ##### Description
 Add a promise before or after every time a particular method is called
-in the change
+in the chain
 ```js
 .after(<name>, function(result) {
   return new Promise(function (resolve, reject) {
