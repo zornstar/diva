@@ -273,12 +273,4 @@ john
   //Run the script from top to bottom, passing in the parameter as the initial
   //waterfall value.
   .run('from the top!')
-
-
 ```
-=======
-diva
-====
-
-A small framework to enable a waterfall of chained expressive methods returning promises
->>>>>>> 8b611f63870fe7f5926fc33309892a431a951489
