@@ -1,7 +1,7 @@
 {
   "name": "diva",
   "version": "0.0.1",
-  "description": "Expressive waterfall based chained promises",
+  "description": "Expressive waterfalls with chained promises",
   "main": "index.js",
   "repository": {
     "type": "git",
