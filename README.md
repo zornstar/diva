@@ -3,6 +3,67 @@
 Expressive waterfall chaining using promises
 
 <br/>
+
+## Overview
+
+This module aims to fill in the skeleton to write clear, concise, and expressive code
+for other modules:
+
+It provides a base class and patterns for creating concurrent,
+actor-based javascript, and allowed for chaining synchronous and asynchronous
+events in an expressive, waterfall like matter.
+
+```javascript
+
+var jimmy = new Person();
+var dana  = new Person();
+
+diva(jimmy);
+diva(dana);
+
+jimmy
+  .jog('10mph')
+  .stopJogging()
+  .pause(10000)
+  .walk('2 miles')
+  .send(dana)
+  .after('stopJogging', function(result) {
+    return new Promise(function(resolve, reject) {
+      console.log('Resting...');
+    }
+  })
+  .jog('10mph')
+  .run()
+ ...
+
+dana
+  .study()
+  .pause(2000)
+  .onReceipt(function(msg) {
+
+    console.log('How many miles did jimmy jog?')
+    this
+      .display('delayed response')
+  })
+  .pause(4000)
+  .run()
+
+```
+
+More generally, expanding this module with other popular modules like request
+can create simple and expressive client side modules for interacting with apis.
+
+```javascript
+
+client
+  request('www.somesite.com/api/get/5')
+  parse()
+  save(__dirname + '/people')
+
+The module depends on RSVP, but any promise library including native ES6 Promises
+should work.
+
+<br/>
 ## Installation
 
 <br/>
@@ -13,18 +74,21 @@ $ npm install diva
 ```
 
 <br/>
-## Overview
-
-This module provides a few methods and patterns for creating
-a single object script for chaining synchronous and asynchronous
-events in an expressive, waterfall like matter.  Each "result" is passed
-to the next object.
-
-The only dependency is RSVP, but any promise library including ES6 Promises
-should work.
-
-<br/>
 ## API
+
+### Initialization
+
+Use diva(<Class>) to add the Diva skeleton to the class:
+
+```js
+var diva = require('diva');
+
+var Person = function() {
+  this.name = 'Name';
+}
+
+diva(Person);
+```
 
 ### this.generate
 
@@ -77,10 +141,23 @@ waterfall.
 Get a property of the diva object and send it down the waterfall
 
 ```js
-.get(<name>, [value])
+.get(<name>)
 ```
 
 <br/>
+<br/>
+### remove
+
+##### Description
+
+Get and remove a property of the diva object and send it down the waterfall
+
+```js
+.remove(<name>)
+```
+
+<br/>
+<br>
 ### display
 
 ##### Description
@@ -110,45 +187,52 @@ Pause the chain for a certain amount of time
 Change the waterfall value
 
 ```js
-.change(<time>)
+.change(<value>)
 ```
 <br/>
-### fork
+
+### send
 
 ##### Description
 
-Send the current value to another diva chain that will execute
-after the current chain.  Will call run(value) on that chain
-with the waterfall value on the fork point.  The waterfall value
-passes throuhg.
+Send the current value (or a specified message) to another diva chain that
+will receive the message with onReceipt (it does not have to be a diva object)
 
 ```js
-.fork(<diva>)
+.change(<receiver>, [message])
 ```
+
+### mail
+
+##### Description
+
+Mail a current value to another diva chain that will receive the message and put it
+in its mailbox
 
 ```js
-
-Person = diva(Person);
-var jim = new Person();
-var jason = new Person();
-
-jim
-  .lift() //value = 200
-  .lift() //value = 300
-  .lift() //value = 400
-  .fork(jason)
-  .lift() //value = 500
-  .display() //500
-  .run()
-
-jason
-  .lift() //value = 400 + 100 = 500
-  .lift() //value = 600
-  .lift() //value = 700
-  .display()
+.change(<receiver>, [message])
 ```
-<br/>
-<br/>
+
+### onReceive(function)
+
+##### Description
+
+Receive the value from a sender.  Execute immediately, or call diva methods from the
+callback and run to run synchronously after the current queue.
+
+
+### retrieve(<x>)
+
+##### Description
+
+Pull the bottom (oldest) x values out of the mailbox
+
+### draw(<x>)
+
+##### Description
+
+Pull the top (recent) x values out of the mailbox
+
 
 ## Example Usage
 
@@ -173,7 +257,6 @@ Add the diva prototypes to the object type.
 ```js
 Person = diva(Person);
 ```
-
 
 Create methods with a specific signature:
 
@@ -243,36 +326,60 @@ Person.prototype.changeName = function(name) {
 }
 
 /***********/
-/*SAMPLE*/
+diva(Person);
+diva(Other);
 
 var john = new Person();
+var mary = new Other();
 
 john
   .display()
-  .lift()
-  .set('first lift')
-  .google()
-  .display('10 second pause')
+  .send(mary, "Mary I am going to the store for 10 seconds.")
+  .goToStore()
+  .set('location')
   .pause(10000)
-  .lift()
+  .mail(mary, "I'm not coming home")
+  .onRecieve(function(msg) {
+
+    if(msg === 'Where are you John?') {
+      console.log('John: ' + this.location)
+    }
+
+    this
+      .display('(Delayed Reaction) What a nag...')
+   })
+  .pause(10000)
+  .display("I'm back!!!")
+  .run('I am John')
+
+mary
+  .display('I am Mary')
+  .pause(5000)
+  .display('Mary is twiddling her thumbs')
+  .pause(12000)
+  .display('John is not back yet')
+  .display('Let me ask where he is.')
+  .send(john, 'Where are you John?')
+  .display("Why don't I check the mail...")
+  .retrieve()
   .display()
-  .google('john')
-  .save(__dirname + '/test.txt')
-  .display()
-  .changeName('Mary')
-  //After injects itself after each method with the name in the first parameter
-  //It takes a function with the same signature as other methods.
-  .after('lift', function(result) {
+  .after('display', function(result) {
     return new Promise(function (resolve, reject) {
-      console.log('Wow!!!' + ' ' + result)
-      console.log('That was exausting!')
+      console.log(' (Mary talks a lot)')
       resolve(result);
     });
-  })
-  .get('first lift')
-  .display()
+   })
+  .google('google')
+  .save(__dirname + '/test.txt')
+  .onRecieve(function(msg) {
 
-  //Run the script from top to bottom, passing in the parameter as the initial
-  //waterfall value.
-  .run('from the top!')
+    console.log('John->Mary: ' + msg);
+  })
+  .run()
+  .pause(1000)
+  .display('((Sleep))')
+  .run()
+
+console.log('***Begin Scene***')
+
 ```

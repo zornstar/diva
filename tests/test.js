@@ -9,37 +9,38 @@ var Person = function() {
   this.strength = 100;
 }
 
-Person = diva(Person);
+var Other = function() {
+  this.name = "Mary Smith"
+  this.gender = "female"
+  this.strength = 200;
+}
 
-Person.prototype.lift = function(weight) {
+Person.prototype.goToStore = function(weight) {
   var that = this;
-  return that.generate(function lift(result) {
+  return that.generate(function goToStore(result) {
     return new Promise(function (resolve, reject) {
-      that.strength+=100
-      console.log('Strength: ' + that.strength);
-      resolve(that.strength);
+      console.log(that.name + " went to the store");
+      resolve('Store');
     });
   });
 }
 
-Person.prototype.google = function(query) {
+Other.prototype.google = function(query) {
   var that = this;
   return that.generate(function google(result) {
     return new Promise(function (resolve, reject) {
       query = query || result;
-      console.log(query);
       var url = "https://www.google.com/#q=" + query;
       console.log('Making request to ' + url);
       request(url, function (err, response, body) {
         if(err) reject(err);
         console.log('Success!')
-        resolve(body);
       });
     });
   });
 }
 
-Person.prototype.save = function(fileName) {
+Other.prototype.save = function(fileName) {
   var that = this;
   return that.generate(function save(result) {
     return new Promise(function (resolve, reject) {
@@ -51,41 +52,59 @@ Person.prototype.save = function(fileName) {
   });
 }
 
-Person.prototype.changeName = function(name) {
-  var that = this;
-  return that.generate(function changeName(result) {
-    return new Promise(function (resolve, reject) {
-        that.name = name;
-        console.log('I changed my name to ' + name);
-        resolve(name);
-    });
-  });
-}
-
 /***********/
+diva(Person);
+diva(Other);
+
 var john = new Person();
-console.log(__dirname);
+var mary = new Other();
 
 john
   .display()
-  .lift()
-  .set('first lift')
-  .google()
-  .display('10 second pause')
+  .send(mary, "Mary I am going to the store for 10 seconds.")
+  .goToStore()
+  .set('location')
   .pause(10000)
-  .lift()
+  .mail(mary, "I'm not coming home")
+  .onRecieve(function(msg) {
+
+    if(msg === 'Where are you John?') {
+      console.log('John: ' + this.location)
+    }
+
+    this
+      .display('(Delayed Reaction) What a nag...')
+   })
+  .pause(10000)
+  .display("I'm back!!!")
+  .run('I am John')
+
+mary
+  .display('I am Mary')
+  .pause(5000)
+  .display('Mary is twiddling her thumbs')
+  .pause(12000)
+  .display('John is not back yet')
+  .display('Let me ask where he is.')
+  .send(john, 'Where are you John?')
+  .display("Why don't I check the mail...")
+  .retrieve()
   .display()
-  .google('john')
-  .save(__dirname + '/test.txt')
-  .display()
-  .changeName('Mary')
-  .after('lift', function(result) {
+  .after('display', function(result) {
     return new Promise(function (resolve, reject) {
-      console.log('Wow!!!' + ' ' + result)
-      console.log('That was exausting!')
+      console.log(' (Mary talks a lot)')
       resolve(result);
     });
+   })
+  .google('google')
+  .save(__dirname + '/test.txt')
+  .onRecieve(function(msg) {
+
+    console.log('John->Mary: ' + msg);
   })
-  .get('first lift')
-  .display()
-  .run('from the top!')
+  .run()
+  .pause(1000)
+  .display('((Sleep))')
+  .run()
+
+console.log('***Begin Scene***')
