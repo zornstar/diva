@@ -1,13 +1,13 @@
 {
   "name": "diva",
-  "version": "0.0.31",
-  "description": "Expressive waterfalls with chained promises",
+  "version": "0.0.33",
+  "description": "Actor based javascript objects, with chaining, promises, and messaging",
   "main": "index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/zornstar/diva"
   },
-  "keywords": ["waterfall","expressive","chain","promises","diva"],
+  "keywords": ["waterfall","expressive","chain","promises","diva", "actor", "messaging"],
   "author": "Matthew Zorn <zornstar@gmail.com>",
   "license": "Apache 2.0",
   "bugs": {

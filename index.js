@@ -24,7 +24,12 @@ Diva {
     this.__queue.push(promiseFunction);
     return this;
   },
-
+  enqueue: function(generatedFunction) {
+    if(!this.__queue) {
+      this.__queue = [ ]
+    }
+    this.__queue.push(generatedFunction);
+  },
   after: function(name, promisefunc) {
     for(var i = 0; i < this.__queue.length; ++i) {
       if(this.__queue[i].name === name) {
@@ -53,7 +58,7 @@ Diva {
         }, delay)
       });
     }
-    this.__queue.push(generator);
+    this.enqueue(generator);
     return this;
   },
 
@@ -65,7 +70,7 @@ Diva {
         resolve(result);
       });
     }
-    this.__queue.push(generator);
+    this.enqueue(generator);
     return this;
   },
 
@@ -75,7 +80,7 @@ Diva {
         resolve(value)
       });
     }
-    this.__queue.push(generator);
+    this.enqueue(generator);
     return this;
   },
 
@@ -87,7 +92,7 @@ Diva {
         resolve(that[prop]);
       });
     }
-    this.__queue.push(generator);
+    this.enqueue(generator);
     return this;
   },
 
@@ -98,7 +103,7 @@ Diva {
         resolve(that[prop] || null);
       });
     }
-    this.__queue.push(generator);
+    this.enqueue.push(generator);
     return this;
   }
 
@@ -122,7 +127,7 @@ Diva {
         resolve(value || result);
       });
     }
-    this.__queue.push(generator);
+    this.enqueue.push(generator);
     return this;
   },
 
@@ -130,12 +135,19 @@ Diva {
     var generator = function mail(result) {
       return new Promise(function (resolve, reject) {
 
-        friend.__mailbox.push(value || result);
+        friend.__mailbox(value || result);
         resolve(result);
       });
     }
-    this.__queue.push(generator);
+    this.enqueue.push(generator);
     return this;
+  },
+
+  __mailbox: function(mail) {
+    if(!this.__mailbox) {
+      this.__mailbox = [ ]
+    }
+    this.__mailbox.push(mail);
   },
 
   retrieve: function(num) {
@@ -158,7 +170,7 @@ Diva {
         }
       });
     }
-    this.__queue.push(generator);
+    this.enqueue.push(generator);
     return this;
   },
 
@@ -182,7 +194,7 @@ Diva {
         }
       });
     }
-    this.__queue.push(generator);
+    this.enqueue.push(generator);
     return this;
   },
 
@@ -194,6 +206,4 @@ Diva {
 
   module.exports = function(obj) {
     for(var p in Diva) { obj.prototype[p] = Diva[p]; }
-    obj.prototype.__queue = [ ];
-    obj.prototype.__mailbox = [ ];
   }

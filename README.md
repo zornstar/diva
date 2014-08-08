@@ -1,6 +1,6 @@
 # diva
 
-Expressive waterfall chaining using promises
+*Expressive, actor-based javascript*
 
 <br/>
 
@@ -59,6 +59,7 @@ client
   request('www.somesite.com/api/get/5')
   parse()
   save(__dirname + '/people')
+```
 
 The module depends on RSVP, but any promise library including native ES6 Promises
 should work.
@@ -265,72 +266,14 @@ Create methods with a specific signature:
   return that.generate(function <name>(result) {
     return new Promise(function (resolve, reject)) {
 
-    //logic goes here
+    resolve(<value-to-pass>)
     });
   });
 ```
-Use resolve to waterfall the next value to the next promise / chained method.
 
-For example:
+Chain methods together and send to send messages to other diva objects (or any message handler)
 
 ```js
-Person.prototype.lift = function(weight) {
-  var that = this;
-  return that.generate(function lift(result) {
-    return new Promise(function (resolve, reject) {
-      that.strength+=100 //modify strength of object
-      console.log('Strength: ' + that.strength);
-      resolve(that.strength);//passes that.strength to the next item
-    });
-  });
-}
-
-Person.prototype.google = function(query) {
-  var that = this;
-  return that.generate(function google(result) {
-    return new Promise(function (resolve, reject) {
-      query = query || result;
-      console.log(query);
-      var url = "https://www.google.com/#q=" + query;
-      console.log('Making request to ' + url);
-      request(url, function (err, response, body) {
-        if(err) reject(err);
-        console.log('Success!')
-        resolve(body);
-      });
-    });
-  });
-}
-
-Person.prototype.save = function(fileName) {
-  var that = this;
-  return that.generate(function save(result) {
-    return new Promise(function (resolve, reject) {
-      fs.writeFile(fileName, result, function(err) {
-        if(err) reject(err);
-        resolve(fileName);
-      });
-    });
-  });
-}
-
-Person.prototype.changeName = function(name) {
-  var that = this;
-  return that.generate(function changeName(result) {
-    return new Promise(function (resolve, reject) {
-        that.name = name;
-        console.log('I changed my name to ' + name);
-        resolve(name);
-    });
-  });
-}
-
-/***********/
-diva(Person);
-diva(Other);
-
-var john = new Person();
-var mary = new Other();
 
 john
   .display()
