@@ -1,17 +1,13 @@
 # diva
 
-*Expressive, actor-based javascript*
-
-<br/>
+**still in development mode**
 
 ## Overview
 
-This module aims to fill in the skeleton to write clear, concise, and expressive code
-for other modules:
+This module is a base to write node modules with clear, concise, and expressive code. It provides a base class, methods, and patterns for creating concurrent,
+actor-based javascript.
 
-It provides a base class and patterns for creating concurrent,
-actor-based javascript, and allowed for chaining synchronous and asynchronous
-events in an expressive, waterfall like matter.
+Basically, the goal is to allow expressive, simple scripting like this:
 
 ```javascript
 
@@ -29,7 +25,8 @@ jimmy
   .send(dana)
   .after('stopJogging', function(result) {
     return new Promise(function(resolve, reject) {
-      console.log('Resting...');
+      jimmy
+        .say('Resting...');
     }
   })
   .jog('10mph')
@@ -41,9 +38,10 @@ dana
   .pause(2000)
   .onReceipt(function(msg) {
 
-    console.log('How many miles did jimmy jog?')
-    this
-      .display('delayed response')
+    dana
+      .say('How many miles did jimmy jog?')
+      .say(msg);
+
   })
   .pause(4000)
   .run()
@@ -91,7 +89,7 @@ var Person = function() {
 diva(Person);
 ```
 
-### this.generate
+### that.queue( fn )
 
 ##### Description
 
@@ -99,7 +97,7 @@ Creates a function to create a promise in the internal queue.  Use with
 prototypes to create chainable waterfall promises.
 
 ```js
-that.generate(function <name>(result) {
+that.queue(function <name>(result) {
   return new Promise(function (resolve, reject)) {
 
   //logic goes here
@@ -107,6 +105,45 @@ that.generate(function <name>(result) {
 ```
 
 <br/>
+<br/>
+
+### run
+
+##### Description
+
+Run the current queue, passing in a value to the first method in the chain.
+
+```js
+.run([value])
+```
+<br/>
+<br/>
+
+### stop
+
+##### Description
+
+Stop running the queue.
+
+```js
+.stop()
+```
+<br/>
+<br/>
+
+### empty
+
+##### Description
+
+Empty the current queue.
+
+```js
+.empty()
+```
+<br/>
+<br/>
+
+
 ### before, after
 
 ##### Description
@@ -120,8 +157,9 @@ in the chain
   });
 })
 ```
-
 <br/>
+<br/>
+
 ### set
 
 ##### Description
@@ -214,13 +252,18 @@ in its mailbox
 .change(<receiver>, [message])
 ```
 
-### onReceive(function)
+### onReceive( fn(msg) { })
 
 ##### Description
 
 Receive the value from a sender.  Execute immediately, or call diva methods from the
 callback and run to run synchronously after the current queue.
 
+### isRunning()
+
+##### Description
+
+Returns true if the diva object is running a queue
 
 ### retrieve(<x>)
 
@@ -246,11 +289,7 @@ var request = require('request')
 
 Create any type of "object"
 ``` js
-var Person = function() {
-  this.name = "John Smith"
-  this.gender = "male"
-  this.strength = 100;
-}
+var Person = function() { }
 ```
 
 Add the diva prototypes to the object type.
@@ -263,7 +302,7 @@ Create methods with a specific signature:
 
 ```js
   var that = this;
-  return that.generate(function <name>(result) {
+  return that.queue(function <name>(result) {
     return new Promise(function (resolve, reject)) {
 
     resolve(<value-to-pass>)
@@ -271,9 +310,18 @@ Create methods with a specific signature:
   });
 ```
 
-Chain methods together and send to send messages to other diva objects (or any message handler)
+Chain methods together and send messages to other diva objects (or any message handler)
 
 ```js
+
+john.name = 'john'
+mary.name = 'mary'
+
+var end = {
+  onReceive: function(msg) {
+    console.log("***End Scene***")
+  }
+}
 
 john
   .display()
@@ -281,47 +329,52 @@ john
   .goToStore()
   .set('location')
   .pause(10000)
-  .mail(mary, "I'm not coming home")
-  .onRecieve(function(msg) {
-
+  .mail(mary, "(Mail) John->Mary: I'm not coming home for another 10 seconds")
+  .pause(10000)
+  .recieve(function onReceive(msg) {
     if(msg === 'Where are you John?') {
-      console.log('John: ' + this.location)
+      console.log('John: I am at the ' + this.location)
     }
 
     this
-      .display('(Delayed Reaction) What a nag...')
+      .empty()
+      .display('John: What a nag...')
+      .send(end)
+      .run()
    })
-  .pause(10000)
-  .display("I'm back!!!")
-  .run('I am John')
+  .display("John: I'm back!!!")
+  .run('Actor: John')
+  .display('Will not show up')
 
 mary
-  .display('I am Mary')
-  .pause(5000)
-  .display('Mary is twiddling her thumbs')
-  .pause(12000)
-  .display('John is not back yet')
-  .display('Let me ask where he is.')
+  .display()
+  .pause(2000)
+  .display('**Mary is twiddling her thumbs**')
+  .pause(15000)
+  .display('Mary: John is not back yet')
+  .display('Mary: Let me ask where he is.')
   .send(john, 'Where are you John?')
-  .display("Why don't I check the mail...")
+  .display("Mary: Why don't I check the mail...")
   .retrieve()
   .display()
-  .after('display', function(result) {
+  .after('display', function onAfter(result) {
     return new Promise(function (resolve, reject) {
-      console.log(' (Mary talks a lot)')
+      console.log('(Mary talks a lot)');
       resolve(result);
     });
    })
   .google('google')
   .save(__dirname + '/test.txt')
-  .onRecieve(function(msg) {
-
+  .recieve(function(msg) {
     console.log('John->Mary: ' + msg);
   })
-  .run()
-  .pause(1000)
   .display('((Sleep))')
+  .run('Actor: Mary')
+  .display('Will show up')
   .run()
+  .error( function(msg) {
+      console.log(msg)
+  })
 
 console.log('***Begin Scene***')
 
