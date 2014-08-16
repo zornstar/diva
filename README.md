@@ -107,6 +107,15 @@ that.queue(function <name>(result) {
 <br/>
 <br/>
 
+### Promise
+
+##### Description
+
+Expose the rsvp Promise object
+```js
+var Promise = require('diva').Promise
+```
+
 ### run
 
 ##### Description

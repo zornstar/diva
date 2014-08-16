@@ -241,3 +241,5 @@ var Diva = {
 module.exports = function(obj) {
   for(var p in Diva) { obj.prototype[p] = Diva[p]; }
 }
+
+module.exports.Promise = Promise;

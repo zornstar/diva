@@ -1,6 +1,6 @@
 var request = require('request')
   , diva    = require('../index')
-  , Promise = require('rsvp').Promise
+  , Promise = diva.Promise
   , fs      = require('fs')
 
 var Person = function() {};
