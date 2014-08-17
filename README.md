@@ -36,11 +36,11 @@ jimmy
 dana
   .study()
   .pause(2000)
-  .onReceipt(function(msg) {
+  .receipt(function(msg) {
 
     dana
       .say('How many miles did jimmy jog?')
-      .say(msg);
+      .say(msg)
 
   })
   .pause(4000)
@@ -54,9 +54,9 @@ can create simple and expressive client side modules for interacting with apis.
 ```javascript
 
 client
-  request('www.somesite.com/api/get/5')
-  parse()
-  save(__dirname + '/people')
+  .request('www.somesite.com/api/get/5')
+  .parse()
+  .save(__dirname + '/people')
 ```
 
 The module depends on RSVP, but any promise library including native ES6 Promises
